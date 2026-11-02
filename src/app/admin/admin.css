@@ -241,3 +241,9 @@
 .hour-row { display: grid; grid-template-columns: 90px auto 1fr; align-items: center; gap: var(--space-md); }
 .hour-row .row { gap: 6px; }
 .time { width: 132px; min-height: 40px; padding: 6px 10px; }
+
+/* ---------- lista de espera ---------- */
+.alerts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-sm); }
+.alerts li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--bg-soft); border: 2px solid var(--border-outline); border-radius: var(--radius-md); }
+.alerts li .grow { display: flex; flex-direction: column; min-width: 0; }
+.alerts li.is-done { opacity: 0.6; }

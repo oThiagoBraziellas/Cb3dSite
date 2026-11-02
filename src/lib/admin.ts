@@ -2,10 +2,10 @@ import 'server-only'
 import { redirect } from 'next/navigation'
 import { cache } from 'react'
 import { mapProduct, PRODUCT_SELECT } from './data'
-import { demoCategories, demoDates, demoOccasions, demoOrders, demoProducts, demoSettings, demoSlides, demoTestimonials } from './demo'
+import { demoAlerts, demoCategories, demoDates, demoOccasions, demoOrders, demoProducts, demoSettings, demoSlides, demoTestimonials } from './demo'
 import { isDemo, publicMediaUrl } from './supabase/env'
 import { serverClient } from './supabase/server'
-import type { Category, Occasion, Order, OrderStatus, Product, Settings, Slide, SpecialDate, Testimonial } from './types'
+import type { Category, Occasion, Order, OrderStatus, Product, Settings, Slide, SpecialDate, StockAlert, Testimonial } from './types'
 
 export type AdminSession = { demo: true; email: string } | { demo: false; email: string; userId: string }
 
@@ -87,6 +87,14 @@ export async function getAdminProduct(id: string): Promise<Product | null> {
   const supabase = await serverClient()
   const { data } = await supabase.from('products').select(PRODUCT_SELECT).eq('id', id).maybeSingle()
   return data ? mapProduct(data) : null
+}
+
+export async function getStockAlerts(productId: string): Promise<StockAlert[]> {
+  await requireAdmin()
+  if (isDemo) return demoAlerts.filter((a) => a.product_id === productId)
+  const supabase = await serverClient()
+  const { data } = await supabase.from('stock_alerts').select('*').eq('product_id', productId).order('created_at', { ascending: false })
+  return (data as StockAlert[]) ?? []
 }
 
 export async function getTaxonomy(): Promise<{ categories: Category[]; occasions: Occasion[] }> {

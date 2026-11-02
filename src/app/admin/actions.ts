@@ -180,6 +180,19 @@ export async function quickStock(id: string, stock: number): Promise<ActionResul
   return { ok: true }
 }
 
+export async function updateStockAlert(id: string, action: 'avisado' | 'pendente' | 'apagar'): Promise<ActionResult> {
+  await requireAdmin()
+  if (isDemo) return DEMO
+  const supabase = await serverClient()
+  const { error } =
+    action === 'apagar'
+      ? await supabase.from('stock_alerts').delete().eq('id', id)
+      : await supabase.from('stock_alerts').update({ notified: action === 'avisado' }).eq('id', id)
+  if (error) return { ok: false, error: 'Não salvou.' }
+  revalidatePath('/admin/produtos', 'layout')
+  return { ok: true }
+}
+
 /* ------------------------------------------------------------------ */
 /* Categorias e ocasiões                                               */
 /* ------------------------------------------------------------------ */

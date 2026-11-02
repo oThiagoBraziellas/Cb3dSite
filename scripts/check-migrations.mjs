@@ -110,5 +110,15 @@ else fail('status ' + r.rows[0].status)
 await db.exec(`update public.products set price_cents = 3600 where id = '${urso}'`)
 ok('admin altera preço')
 
+// --- spam
+await as('anon')
+for (let i = 0; i < 4; i++)
+  await db.query(`select * from public.submit_order('Juliana', '61912345678', null, '', '[{"product_id":"${urso}","qty":1}]'::jsonb)`)
+await expectError(
+  `select * from public.submit_order('Juliana', '61912345678', null, '', '[{"product_id":"${urso}","qty":1}]'::jsonb)`,
+  'bloqueia o 6º pedido do mesmo WhatsApp na mesma hora',
+)
+await expectError(`insert into storage.objects (bucket_id, name) values ('referencias', 'pedidos/x.jpg')`, 'visitante não sobe arquivo direto no storage')
+
 await db.exec('reset role;')
 console.log(process.exitCode ? '\nFalhou.' : '\nTudo certo.')

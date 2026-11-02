@@ -129,3 +129,5 @@ export type ListItem = {
   gift_message: string
   qty: number
 }
+
+export type StockAlert = { id: string; product_id: string; name: string; phone: string; notified: boolean; created_at: string }

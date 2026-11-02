@@ -5,6 +5,7 @@ import { after } from 'next/server'
 import { notifyNewOrder } from '@/lib/notify'
 import { isDemo } from '@/lib/supabase/env'
 import { publicClient } from '@/lib/supabase/public'
+import { serviceClient } from '@/lib/supabase/service'
 import { onlyDigits } from '@/lib/format'
 
 type Result = { ok: true; number: number | null } | { ok: false; error: string }
@@ -49,6 +50,7 @@ export async function submitOrder(input: OrderInput): Promise<Result> {
   })
   if (error || !data?.[0]) {
     const msg = error?.message ?? ''
+    if (msg.includes('muitos pedidos')) return { ok: false, error: 'Recebemos muitos pedidos agora. Tenta de novo daqui a pouco ou chama a Cintia no WhatsApp.' }
     if (msg.includes('esgotada') || msg.includes('indisponível'))
       return { ok: false, error: 'Uma das peças acabou de esgotar. Confere a lista e tenta de novo.' }
     return { ok: false, error: 'Não deu pra registrar agora. Você ainda pode mandar pelo WhatsApp.' }
@@ -96,9 +98,11 @@ export async function submitCustomRequest(_prev: CustomState, fd: FormData): Pro
     if (file.size > 10 * 1024 * 1024) return { ok: false, error: 'A foto passa de 10 MB. Manda uma menor ou envia depois no WhatsApp.' }
     const ext = IMG[file.type as keyof typeof IMG]
     if (!ext) return { ok: false, error: 'A foto precisa ser JPG, PNG ou WebP.' }
-    if (!isDemo) {
+    // só o servidor sobe a foto (com a chave secreta); o storage não aceita upload anônimo
+    const svc = isDemo ? null : serviceClient()
+    if (svc) {
       referencePath = `pedidos/${randomUUID()}.${ext}`
-      const { error } = await publicClient().storage.from('referencias').upload(referencePath, file, { contentType: file.type, upsert: false })
+      const { error } = await svc.storage.from('referencias').upload(referencePath, file, { contentType: file.type, upsert: false })
       if (error) referencePath = null
     }
   }
@@ -117,7 +121,10 @@ export async function submitCustomRequest(_prev: CustomState, fd: FormData): Pro
     p_qty: qty,
     p_reference_path: referencePath,
   })
-  if (error) return { ok: false, error: 'Não deu pra enviar agora. Tenta de novo ou chama a Cintia no WhatsApp.' }
+  if (error) {
+    if (error.message.includes('muitos pedidos')) return { ok: false, error: 'Você já mandou algumas ideias agora há pouco. Espera um pouquinho ou chama a Cintia no WhatsApp.' }
+    return { ok: false, error: 'Não deu pra enviar agora. Tenta de novo ou chama a Cintia no WhatsApp.' }
+  }
   const number = data as number
   after(() => notifyNewOrder({ number, kind: 'personalizado', name, summary: `${type} · ${qty} un.${neededBy ? ` · até ${neededBy}` : ''}\n${description.slice(0, 180)}` }))
   return { ok: true, number, wa }

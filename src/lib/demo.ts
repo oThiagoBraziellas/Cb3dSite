@@ -1,6 +1,6 @@
 // Dados de exemplo usados quando o Supabase ainda não foi configurado.
 // Espelham supabase/seed.sql.
-import type { Category, Occasion, Order, Product, Settings, Slide, SpecialDate, Testimonial } from './types'
+import type { Category, Occasion, Order, Product, Settings, Slide, SpecialDate, StockAlert, Testimonial } from './types'
 
 export const demoCategories: Category[] = [
   { id: 'c1', slug: 'presentes', name: 'Presentes personalizados', icon: 'presente', color: 'rosa', position: 1 },
@@ -114,4 +114,9 @@ export const demoOrders: Order[] = [
   { id: 'r3', number: 126, source: 'lista', status: 'pronto', customer_name: 'Renata', customer_phone: '61977776666', needed_by: '2026-12-10', notes: '', total_cents: 5500, agreed_cents: 5500, custom_type: null, custom_description: null, custom_colors: [], custom_size: null, custom_qty: null, reference_path: null, stock_applied: true, seen_at: '2026-10-29T12:00:00Z', created_at: '2026-10-29T11:00:00Z', items: [{ id: 'i2', product_id: 'p4', product_name: 'Organizador de mesa', color: 'Roxo', personalization: '', gift: false, gift_message: '', qty: 1, unit_cents: 5500 }] },
   { id: 'r4', number: 125, source: 'lista', status: 'producao', customer_name: 'Paula', customer_phone: '61966665555', needed_by: '2026-12-14', notes: '', total_cents: 8000, agreed_cents: 8000, custom_type: null, custom_description: null, custom_colors: [], custom_size: null, custom_qty: null, reference_path: null, stock_applied: true, seen_at: '2026-10-28T12:00:00Z', created_at: '2026-10-28T10:00:00Z', items: [{ id: 'i3', product_id: 'p2', product_name: 'Ursinho articulado', color: 'Rosa chiclete', personalization: '', gift: true, gift_message: 'Feliz Natal!', qty: 2, unit_cents: 4000 }] },
   { id: 'r5', number: 124, source: 'lista', status: 'entregue', customer_name: 'Bruno', customer_phone: '61955554444', needed_by: null, notes: '', total_cents: 9000, agreed_cents: 9000, custom_type: null, custom_description: null, custom_colors: [], custom_size: null, custom_qty: null, reference_path: null, stock_applied: true, seen_at: '2026-10-20T12:00:00Z', created_at: '2026-10-20T10:00:00Z', items: [{ id: 'i4', product_id: 'p1', product_name: 'Chaveiro com nome', color: 'Azul', personalization: 'Bruno', gift: false, gift_message: '', qty: 5, unit_cents: 1800 }] },
+]
+
+export const demoAlerts: StockAlert[] = [
+  { id: 'a1', product_id: 'p3', name: 'Ana', phone: '61999990000', notified: false, created_at: '2026-10-31T15:00:00Z' },
+  { id: 'a2', product_id: 'p3', name: 'Carla', phone: '61988881111', notified: true, created_at: '2026-10-25T12:00:00Z' },
 ]
